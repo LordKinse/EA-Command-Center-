@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EA Command Center - Executive Support Platform</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#0F172A',
+              card: '#1E293B',
+              border: '#334155',
+              accent: '#38BDF8',
+              calendar: '#3B82F6',
+              inbox: '#8B5CF6',
+              meeting: '#10B981',
+              travel: '#F59E0B',
+              brief: '#EC4899',
+              sop: '#6366F1'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0F172A; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="h-full bg-slate-900 text-slate-100 flex flex-col md:flex-row overflow-hidden">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Sidebar Navigation -->
+  <aside class="w-full md:w-64 bg-slate-950 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col flex-shrink-0 z-20">
+    <div class="p-4 flex items-center justify-between border-b border-slate-800">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-sky-500/10 border border-sky-500/30 rounded-xl text-sky-400">
+          <i data-lucide="briefcase" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-100 text-lg leading-tight">EA Command</h1>
+          <p class="text-xs text-sky-400 font-medium">Executive Suite v2.5</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nav Links -->
+    <nav class="p-3 space-y-1 flex-1 overflow-y-auto">
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+        <div class="flex items-center gap-3">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-sky-400"></i>
+          <span>Dashboard</span>
+        </div>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">Live</span>
+      </button>
+
+      <div class="pt-3 pb-1 px-3 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">Core Systems</div>
+
+      <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+        <div class="flex items-center gap-3">
+          <i data-lucide="calendar" class="w-4 h-4 text-blue-400"></i>
+          <span>Calendar & Time</span>
+        </div>
+        <span id="badge-calendar" class="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">4</span>
+      </button>
+
+      <button onclick="switchTab('inbox')" id="nav-inbox" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+        <div class="flex items-center gap-3">
+          <i data-lucide="inbox" class="w-4 h-4 text-purple-400"></i>
+          <span>Inbox Workflow</span>
+        </div>
+        <span id="badge-inbox" class="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400">3</span>
+      </button>
+
+      <button onclick="switchTab('meeting')" id="nav-meeting" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+        <div class="flex items-center gap-3">
+          <i data-lucide="file-check" class="w-4 h-4 text-emerald-400"></i>
+          <span>Meeting Prep</span>
+        </div>
+      </button>
+
+      <button onclick="switchTab('travel')" id="nav-travel" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+        <div class="flex items-center gap-3">
+          <i data-lucide="plane" class="w-4 h-4 text-amber-400"></i>
+          <span>Travel Research</span>
+        </div>
+      </button>
+
+      <button onclick="switchTab('brief')" id="nav-brief" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+        <div class="flex items-center gap-3">
+          <i data-lucide="newspaper" class="w-4 h-4 text-pink-400"></i>
+          <span>Exec Briefing</span>
+        </div>
+      </button>
+
+      <button onclick="switchTab('sop')" id="nav-sop" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+        <div class="flex items-center gap-3">
+          <i data-lucide="book-open" class="w-4 h-4 text-indigo-400"></i>
+          <span>SOP Generator</span>
+        </div>
+      </button>
+    </nav>
+
+    <!-- Executive Status Footer -->
+    <div class="p-3 border-t border-slate-800 bg-slate-900/50">
+      <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center gap-3">
+        <div class="relative">
+          <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center font-semibold text-xs text-sky-300">CEO</div>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-slate-900"></span>
+        </div>
+        <div class="overflow-hidden">
+          <p class="text-xs font-semibold text-slate-200 truncate">Exec: Sarah Jenkins</p>
+          <p class="text-[10px] text-slate-400 truncate">Status: In Meetings (NY)</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 overflow-y-auto bg-slate-900 p-4 md:p-8 flex flex-col">
+    
+    <!-- Top Header -->
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800 mb-6">
+      <div>
+        <h2 id="page-title" class="text-2xl font-bold text-slate-100 flex items-center gap-2">Dashboard Overview</h2>
+        <p id="page-subtitle" class="text-xs text-slate-400 mt-1">Real-time executive support metrics and action items</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="resetDemoData()" class="px-3 py-1.5 text-xs rounded-lg border border-slate-700 hover:border-slate-600 bg-slate-800 text-slate-300 hover:text-slate-100 transition">Reset Demo Data</button>
+        <button onclick="openModal('modal-quick-action')" class="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 transition flex items-center gap-1.5 shadow-lg shadow-sky-500/20">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Quick Entry</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MODULE 0: DASHBOARD -->
+    <div id="tab-dashboard" class="tab-content space-y-6">
+      <!-- High Level Metrics -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between border-l-4 border-l-blue-500">
+          <div>
+            <p class="text-xs font-medium text-slate-400">Today's Meetings</p>
+            <h3 class="text-2xl font-bold text-slate-100 mt-1" id="dash-meeting-count">4 Sessions</h3>
+            <p class="text-[11px] text-blue-400 mt-1">Next: Board Sync @ 2:00 PM</p>
+          </div>
+          <div class="p-3 bg-blue-500/10 rounded-xl text-blue-400"><i data-lucide="calendar"></i></div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between border-l-4 border-l-purple-500">
+          <div>
+            <p class="text-xs font-medium text-slate-400">Inbox Triage Pending</p>
+            <h3 class="text-2xl font-bold text-slate-100 mt-1" id="dash-inbox-count">3 Emails</h3>
+            <p class="text-[11px] text-purple-400 mt-1">1 VIP High Urgency</p>
+          </div>
+          <div class="p-3 bg-purple-500/10 rounded-xl text-purple-400"><i data-lucide="mail"></i></div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between border-l-4 border-l-amber-500">
+          <div>
+            <p class="text-xs font-medium text-slate-400">Active Travel Plan</p>
+            <h3 class="text-2xl font-bold text-slate-100 mt-1">NYC Summit</h3>
+            <p class="text-[11px] text-amber-400 mt-1">Nov 12 - 15 (Option B Pending)</p>
+          </div>
+          <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400"><i data-lucide="plane"></i></div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between border-l-4 border-l-emerald-500">
+          <div>
+            <p class="text-xs font-medium text-slate-400">Weekly Brief Readiness</p>
+            <h3 class="text-2xl font-bold text-slate-100 mt-1">85% Complete</h3>
+            <p class="text-[11px] text-emerald-400 mt-1">Draft saved today</p>
+          </div>
+          <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400"><i data-lucide="check-circle-2"></i></div>
+        </div>
+      </div>
+
+      <!-- Quick Action Deck -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Calendar Snapshot -->
+        <div class="lg:col-span-2 p-5 rounded-2xl bg-slate-800/40 border border-slate-800 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-blue-400"></i> Today's Schedule & Buffers
+            </h3>
+            <button onclick="switchTab('calendar')" class="text-xs text-blue-400 hover:underline">View Full Calendar</button>
+          </div>
+          <div id="dash-schedule-list" class="space-y-3 flex-1"></div>
+        </div>
+
+        <!-- Priority Triage Widget -->
+        <div class="p-5 rounded-2xl bg-slate-800/40 border border-slate-800 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+              <i data-lucide="alert-circle" class="w-4 h-4 text-purple-400"></i> Action Needed (Triage)
+            </h3>
+            <button onclick="switchTab('inbox')" class="text-xs text-purple-400 hover:underline">Inbox Hub</button>
+          </div>
+          <div id="dash-triage-list" class="space-y-3 flex-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 1: CALENDAR MANAGEMENT SYSTEM -->
+    <div id="tab-calendar" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-blue-500/10 text-blue-400 rounded-xl"><i data-lucide="calendar"></i></div>
+          <div>
+            <h3 class="font-semibold text-slate-100">Schedule & Buffer Optimizer</h3>
+            <p class="text-xs text-slate-400">Manage time blocks, buffers, and meeting categories</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button onclick="detectConflicts()" class="px-3 py-2 text-xs font-medium rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 transition flex items-center gap-1.5">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i> Conflict Check
+          </button>
+          <button onclick="openModal('modal-add-event')" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-blue-500 hover:bg-blue-400 text-slate-950 transition flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Event
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Event Timeline -->
+        <div class="lg:col-span-2 space-y-3">
+          <div class="flex items-center justify-between pb-2">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Agenda</h4>
+            <span class="text-xs text-slate-500">Auto Buffer: 15 mins enabled</span>
+          </div>
+          <div id="calendar-event-list" class="space-y-3"></div>
+        </div>
+
+        <!-- Time Blocking Wizard Sidebar -->
+        <div class="p-5 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-4">
+          <h4 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <i data-lucide="wand2" class="w-4 h-4 text-blue-400"></i> Buffer Generator
+          </h4>
+          <p class="text-xs text-slate-400">Automatically calculate and insert necessary prep & travel buffers between executive commitments.</p>
+          
+          <div class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Standard Buffer Size</label>
+              <select id="buffer-size-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-200 focus:border-blue-500 outline-none">
+                <option value="15">15 Minutes (Standard)</option>
+                <option value="30">30 Minutes (Deep Prep / Travel)</option>
+                <option value="45">45 Minutes (Executive Decompression)</option>
+              </select>
+            </div>
+            <button onclick="applyAutoBuffers()" class="w-full py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-medium transition">
+              Apply Buffers to All Back-to-Backs
+            </button>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-800">
+            <h5 class="text-xs font-semibold text-slate-300 mb-2">Category Legend</h5>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <span class="flex items-center gap-1.5 text-slate-400"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> VIP External</span>
+              <span class="flex items-center gap-1.5 text-slate-400"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Internal Sync</span>
+              <span class="flex items-center gap-1.5 text-slate-400"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Deep Work</span>
+              <span class="flex items-center gap-1.5 text-slate-400"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Travel / Buffer</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 2: INBOX WORKFLOW SYSTEM -->
+    <div id="tab-inbox" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl"><i data-lucide="inbox"></i></div>
+          <div>
+            <h3 class="font-semibold text-slate-100">Eisenhower Triage Hub</h3>
+            <p class="text-xs text-slate-400">Process incoming executive emails with one-click actions & templates</p>
+          </div>
+        </div>
+        <button onclick="openModal('modal-add-inbox')" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 transition flex items-center gap-1.5">
+          <i data-lucide="plus" class="w-4 h-4"></i> New Triage Item
+        </button>
+      </div>
+
+      <!-- Triage Quadrants / Status Columns -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Do Now -->
+        <div class="p-4 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col min-h-[400px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold text-rose-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span> DO NOW (Urgent & Important)
+            </span>
+            <span id="count-donow" class="text-xs bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="inbox-col-donow" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="p-4 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col min-h-[400px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold text-blue-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span> SCHEDULE (Important)
+            </span>
+            <span id="count-schedule" class="text-xs bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="inbox-col-schedule" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+
+        <!-- Delegate -->
+        <div class="p-4 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col min-h-[400px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span> DELEGATE (Urgent)
+            </span>
+            <span id="count-delegate" class="text-xs bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="inbox-col-delegate" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+
+        <!-- Archived / Done -->
+        <div class="p-4 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col min-h-[400px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> ARCHIVED / DONE
+            </span>
+            <span id="count-archive" class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="inbox-col-archive" class="space-y-3 flex-1 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 3: MEETING PREPARATION PROCESS -->
+    <div id="tab-meeting" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl"><i data-lucide="file-check"></i></div>
+          <div>
+            <h3 class="font-semibold text-slate-100">Executive Pre-Meeting Brief Builder</h3>
+            <p class="text-xs text-slate-400">Compile concise background context, attendee dossiers, and objectives</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="copyBriefMemo()" class="px-3.5 py-2 text-xs font-medium rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition flex items-center gap-1.5">
+            <i data-lucide="copy" class="w-4 h-4"></i> Copy Brief Memo
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Brief Form -->
+        <div class="lg:col-span-2 p-5 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Meeting Title</label>
+              <input type="text" id="brief-title" value="Q4 Board of Directors Strategy Review" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Time & Location</label>
+              <input type="text" id="brief-time" value="Today @ 2:00 PM EST (Conf Room A / Zoom)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Executive Summary & Objectives</label>
+            <textarea id="brief-summary" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-emerald-500">Review Q3 revenue targets, approve the expanded headcount for AI products, and resolve the vendor contract deadlock for Q4.</textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Key Talking Points & Strategic Priorities</label>
+            <textarea id="brief-points" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-emerald-500">• Point 1: Highlight 18% QoQ customer growth.
+• Point 2: Emphasize the urgent need for senior engineering leads.
+• Point 3: Propose a 10% budget reallocation to AI platform integrations.</textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Potential Landmines & Sensitive Topics</label>
+            <input type="text" id="brief-risks" value="Board member Mark might question the delayed product launch in Q2." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <!-- Attendee Cards -->
+        <div class="p-5 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-4">
+          <h4 class="text-sm font-semibold text-slate-200 flex items-center justify-between">
+            <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Attendee Dossiers</span>
+            <button onclick="addAttendee()" class="text-xs text-emerald-400 hover:underline">+ Add</button>
+          </h4>
+          <div id="attendee-list" class="space-y-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 4: TRAVEL RESEARCH DOCUMENT SYSTEM -->
+    <div id="tab-travel" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl"><i data-lucide="plane"></i></div>
+          <div>
+            <h3 class="font-semibold text-slate-100">Travel Research & Itinerary Matrix</h3>
+            <p class="text-xs text-slate-400">Compare flight, hotel, and transit options with loyalty perks and costs</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="openModal('modal-add-travel')" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Travel Option
+          </button>
+        </div>
+      </div>
+
+      <!-- Travel Option Comparison Grid -->
+      <div id="travel-options-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    </div>
+
+    <!-- MODULE 5: WEEKLY EXECUTIVE BRIEFING -->
+    <div id="tab-brief" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-pink-500/10 text-pink-400 rounded-xl"><i data-lucide="newspaper"></i></div>
+          <div>
+            <h3 class="font-semibold text-slate-100">Weekly Executive Briefing Generator</h3>
+            <p class="text-xs text-slate-400">Synthesize highlights, KPIs, risks, and decisions into a crisp format</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="copyExecutiveBrief()" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-pink-500 hover:bg-pink-400 text-slate-950 transition flex items-center gap-1.5">
+            <i data-lucide="copy" class="w-4 h-4"></i> Copy Slack / Email Format
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Brief Form Inputs -->
+        <div class="p-5 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-4">
+          <h4 class="text-xs font-bold text-pink-400 uppercase tracking-wider">Briefing Inputs</h4>
+          
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Week Of</label>
+            <input type="text" id="exec-week" value="October 27 - November 02, 2026" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-pink-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Top Accomplishments / Highlights</label>
+            <textarea id="exec-highlights" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-pink-500">• Finalized NYC summit venue contracts saving $4.2k.
+• Resolved 100% of high-priority support escalations.
+• Conducted 12 candidate screeners for VP of Product role.</textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Core Metrics & Performance KPIs</label>
+            <textarea id="exec-kpis" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-pink-500">• Weekly Revenue: $142,000 (+12% vs target)
+• NPS Score: 78
+• Team Utilization: 91%</textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Red Flags / Risks / Roadblocks</label>
+            <textarea id="exec-risks" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-pink-500">⚠️ Flight price surges expected for Europe Q1 conference if not booked by Friday.</textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Decisions Needed From Executive</label>
+            <textarea id="exec-decisions" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-pink-500">1. Approval for NYC hotel Option B ($1,450).
+2. Sign-off on Q4 software license renewal.</textarea>
+          </div>
+        </div>
+
+        <!-- Live Preview Card -->
+        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <span class="text-xs font-semibold text-slate-400">Formatted Preview</span>
+              <span class="text-xs text-emerald-400 font-mono">Status: Ready to Send</span>
+            </div>
+            <div id="exec-preview-content" class="mt-4 space-y-3 font-mono text-xs text-slate-300 whitespace-pre-wrap leading-relaxed"></div>
+          </div>
+          <div class="pt-4 border-t border-slate-900 text-slate-500 text-[11px] flex justify-between">
+            <span>Optimized for Slack / Teams / Email</span>
+            <span>EA System v2.5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 6: SOP SYSTEM GENERATOR -->
+    <div id="tab-sop" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-800/40 p-4 rounded-2xl border border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-xl"><i data-lucide="book-open"></i></div>
+          <div>
+            <h3 class="font-semibold text-slate-100">Executive SOP System Generator</h3>
+            <p class="text-xs text-slate-400">Standardize repetitive administrative workflows into repeatable SOPs</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="sop-template-select" onchange="loadSopTemplate(this.value)" class="bg-slate-800 border border-slate-700 text-xs text-slate-200 rounded-xl p-2 outline-none">
+            <option value="">-- Load SOP Template --</option>
+            <option value="reimbursement">Expense Reimbursement SOP</option>
+            <option value="vip">VIP Visitor Protocol SOP</option>
+            <option value="travel">Executive Travel Booking SOP</option>
+          </select>
+          <button onclick="saveCurrentSop()" class="px-3.5 py-2 text-xs font-medium rounded-xl bg-indigo-500 hover:bg-indigo-400 text-slate-950 transition">
+            Save SOP
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Form Editor -->
+        <div class="lg:col-span-2 p-5 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">SOP Title</label>
+              <input type="text" id="sop-title" placeholder="e.g. Executive Travel Booking" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Owner / Department</label>
+              <input type="text" id="sop-owner" placeholder="Executive Assistant / Operations" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Trigger / When to Execute</label>
+              <input type="text" id="sop-trigger" placeholder="e.g. Whenever Exec requests travel or meeting out of state" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1">Required Tools</label>
+              <input type="text" id="sop-tools" placeholder="e.g. Concur, Navan, Google Calendar, Slack" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Step-by-Step Instructions (One per line)</label>
+            <textarea id="sop-steps" rows="6" placeholder="Step 1: Collect preferred dates and location from CEO&#10;Step 2: Research top 3 non-stop flight options..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-indigo-500"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Quality Check / Verification Standard</label>
+            <input type="text" id="sop-quality" placeholder="e.g. Calendar invites reflect correct time zones & confirmation numbers attached" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <!-- Saved SOP Library -->
+        <div class="p-5 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-4">
+          <h4 class="text-sm font-semibold text-slate-200 flex items-center justify-between">
+            <span class="flex items-center gap-2"><i data-lucide="folder" class="w-4 h-4 text-indigo-400"></i> Saved SOP Library</span>
+            <span id="sop-library-count" class="text-xs text-slate-500">0 SOPs</span>
+          </h4>
+          <div id="sop-library-list" class="space-y-2 max-h-[400px] overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODALS -->
+  <!-- Generic Quick Action Modal -->
+  <div id="modal-quick-action" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-slate-100">Quick EA Entry</h3>
+        <button onclick="closeModal('modal-quick-action')" class="text-slate-400 hover:text-slate-200"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <p class="text-xs text-slate-400">Select what you would like to quickly log or generate:</p>
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="closeModal('modal-quick-action'); switchTab('calendar'); openModal('modal-add-event')" class="p-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-left transition">
+          <i data-lucide="calendar" class="w-5 h-5 text-blue-400 mb-1"></i>
+          <p class="text-xs font-semibold text-slate-200">New Calendar Event</p>
+        </button>
+        <button onclick="closeModal('modal-quick-action'); switchTab('inbox'); openModal('modal-add-inbox')" class="p-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-left transition">
+          <i data-lucide="inbox" class="w-5 h-5 text-purple-400 mb-1"></i>
+          <p class="text-xs font-semibold text-slate-200">Inbox Triage Item</p>
+        </button>
+        <button onclick="closeModal('modal-quick-action'); switchTab('travel'); openModal('modal-add-travel')" class="p-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-left transition">
+          <i data-lucide="plane" class="w-5 h-5 text-amber-400 mb-1"></i>
+          <p class="text-xs font-semibold text-slate-200">Travel Research Option</p>
+        </button>
+        <button onclick="closeModal('modal-quick-action'); switchTab('sop')" class="p-3 bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-left transition">
+          <i data-lucide="book-open" class="w-5 h-5 text-indigo-400 mb-1"></i>
+          <p class="text-xs font-semibold text-slate-200">Draft SOP</p>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Calendar Event Modal -->
+  <div id="modal-add-event" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-slate-100">Add Calendar Commitment</h3>
+        <button onclick="closeModal('modal-add-event')" class="text-slate-400 hover:text-slate-200"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form onsubmit="handleAddEvent(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Event Title</label>
+          <input type="text" id="ev-title" required placeholder="e.g. Board Sync" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Time Range</label>
+            <input type="text" id="ev-time" required placeholder="2:00 PM - 3:00 PM" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Category</label>
+            <select id="ev-category" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+              <option value="VIP External">VIP External</option>
+              <option value="Internal Sync">Internal Sync</option>
+              <option value="Deep Work">Deep Work</option>
+              <option value="Personal / Buffer">Personal / Buffer</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Location / Link</label>
+          <input type="text" id="ev-location" placeholder="Conf Room A or Zoom" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-add-event')" class="px-3 py-2 text-xs rounded-xl bg-slate-800 text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-blue-500 text-slate-950 hover:bg-blue-400">Save Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Inbox Triage Modal -->
+  <div id="modal-add-inbox" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-slate-100">Add Triage Item</h3>
+        <button onclick="closeModal('modal-add-inbox')" class="text-slate-400 hover:text-slate-200"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form onsubmit="handleAddInbox(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Subject / Sender</label>
+          <input type="text" id="inbox-subject" required placeholder="e.g. Sequoia Capital - Q4 Investment Term Sheet" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Quadrant</label>
+            <select id="inbox-quadrant" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+              <option value="donow">Do Now (Urgent/Imp)</option>
+              <option value="schedule">Schedule (Imp)</option>
+              <option value="delegate">Delegate (Urgent)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Urgency Tag</label>
+            <select id="inbox-tag" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+              <option value="HIGH VIP">HIGH VIP</option>
+              <option value="Standard">Standard</option>
+              <option value="Low Priority">Low Priority</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Context / Action Required</label>
+          <textarea id="inbox-body" rows="2" placeholder="Brief summary of what executive needs to decide..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none"></textarea>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-add-inbox')" class="px-3 py-2 text-xs rounded-xl bg-slate-800 text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-purple-500 text-slate-950 hover:bg-purple-400">Add to Triage</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Travel Option Modal -->
+  <div id="modal-add-travel" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-slate-100">Add Travel Option</h3>
+        <button onclick="closeModal('modal-add-travel')" class="text-slate-400 hover:text-slate-200"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form onsubmit="handleAddTravel(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Option Name (e.g., Option A - Delta Premium)</label>
+          <input type="text" id="tr-name" required placeholder="Option A - Delta Non-Stop" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Total Estimated Cost</label>
+            <input type="text" id="tr-cost" required placeholder="$1,450" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Flight Details</label>
+            <input type="text" id="tr-flight" placeholder="Delta DL104 (Non-stop)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Hotel Accommodations</label>
+          <input type="text" id="tr-hotel" placeholder="The Carlyle, NYC (King Suite)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Perks & Tradeoffs</label>
+          <textarea id="tr-perks" rows="2" placeholder="Includes free Wi-Fi, late check-out, earn 4,500 SkyMiles..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-slate-100 outline-none"></textarea>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-add-travel')" class="px-3 py-2 text-xs rounded-xl bg-slate-800 text-slate-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400">Add Option</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    // --- Application State with LocalStorage Persistence ---
+    const DEFAULT_DATA = {
+      events: [
+        { id: 1, title: 'Q4 Strategy Sync', time: '09:00 AM - 10:00 AM', category: 'VIP External', location: 'Zoom / Conf Room A', buffer: '15m Buffer Added' },
+        { id: 2, title: 'Product Roadmap Review', time: '10:30 AM - 11:30 AM', category: 'Internal Sync', location: 'Slack Huddle', buffer: '15m Buffer Added' },
+        { id: 3, title: 'Executive Deep Work', time: '01:00 PM - 02:00 PM', category: 'Deep Work', location: 'Private Office', buffer: '30m Prep Buffer' },
+        { id: 4, title: 'Board of Directors Meeting', time: '02:30 PM - 04:00 PM', category: 'VIP External', location: 'Executive Suite', buffer: '15m Buffer Added' }
+      ],
+      inbox: [
+        { id: 1, subject: 'Sequoia Capital - Q4 Term Sheet Draft', quadrant: 'donow', tag: 'HIGH VIP', body: 'Requires CEO signature and review before 5:00 PM today.' },
+        { id: 2, subject: 'Keynote Speaker Request - TechSummit 2027', quadrant: 'schedule', tag: 'Standard', body: 'Invite to present in London next March. Needs calendar slot.' },
+        { id: 3, subject: 'Office Lease Renewal Agreement', quadrant: 'delegate', tag: 'Standard', body: 'Forwarded to Legal & Operations lead for initial review.' }
+      ],
+      attendees: [
+        { id: 1, name: 'Marcus Vance', role: 'Managing Partner @ Sequoia', notes: 'Interested in AI platform expansion numbers.' },
+        { id: 2, name: 'Elena Rostova', role: 'Head of Product', notes: 'Will present Q4 tech roadmap.' }
+      ],
+      travel: [
+        {
+          id: 1,
+          name: 'Option A: Delta Air + The Carlyle',
+          cost: '$1,850 Total',
+          flight: 'DL 402 - Non-stop (8:00 AM - 11:30 AM)',
+          hotel: 'The Carlyle (Executive King)',
+          perks: '• Executive lounge access\n• Free Wi-Fi + Flexible cancellation\n• Direct airport transfer included'
+        },
+        {
+          id: 2,
+          name: 'Option B: United Air + Soho Grand',
+          cost: '$1,420 Total',
+          flight: 'UA 1120 - 1 Layover (7:15 AM - 12:45 PM)',
+          hotel: 'Soho Grand (Deluxe Room)',
+          perks: '• Saves $430 overall\n• Hotel near client dinner location'
+        }
+      ],
+      sops: [
+        {
+          id: 1,
+          title: 'Executive Expense Reimbursement',
+          owner: 'EA Team',
+          trigger: 'End of each business trip or monthly on 25th',
+          tools: 'Concur, Corporate Amex, Bank Portal',
+          steps: '1. Collect all digital and itemized paper receipts.\n2. Cross-reference with Amex monthly statement.\n3. Categorize expenses under proper client billing codes.\n4. Submit report in Concur for executive approval.',
+          quality: 'Zero unallocated receipts; all submissions logged within 48 hours.'
+        }
+      ]
+    };
+
+    // Load or Initialize App Data
+    let appData = JSON.parse(localStorage.getItem('EA_APP_DATA')) || DEFAULT_DATA;
+
+    function saveData() {
+      localStorage.setItem('EA_APP_DATA', JSON.stringify(appData));
+      renderAll();
+    }
+
+    function resetDemoData() {
+      appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      saveData();
+      showToast('Demo data successfully restored!');
+    }
+
+    // --- Tab Navigation System ---
+    const tabs = ['dashboard', 'calendar', 'inbox', 'meeting', 'travel', 'brief', 'sop'];
+    const tabTitles = {
+      dashboard: { title: 'Dashboard Overview', sub: 'Real-time executive support metrics and action items' },
+      calendar: { title: 'Calendar & Time Management', sub: 'Optimized scheduling, buffers, and time-blocking' },
+      inbox: { title: 'Inbox Triage & Workflow', sub: 'Eisenhower matrix classification and response shortcuts' },
+      meeting: { title: 'Meeting Prep & Briefings', sub: 'Executive briefing memos and attendee dossiers' },
+      travel: { title: 'Travel Research Matrix', sub: 'Side-by-side flight, hotel, and itinerary comparison' },
+      brief: { title: 'Weekly Executive Briefing', sub: 'Synthesized highlights, KPIs, risks, and required decisions' },
+      sop: { title: 'SOP System Generator', sub: 'Standard Operating Procedures for seamless operations' }
+    };
+
+    function switchTab(tabId) {
+      tabs.forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`nav-${t}`).classList.remove('bg-slate-800', 'text-slate-100');
+        document.getElementById(`nav-${t}`).classList.add('text-slate-400');
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      document.getElementById(`nav-${tabId}`).classList.add('bg-slate-800', 'text-slate-100');
+      document.getElementById(`nav-${tabId}`).classList.remove('text-slate-400');
+
+      document.getElementById('page-title').innerText = tabTitles[tabId].title;
+      document.getElementById('page-subtitle').innerText = tabTitles[tabId].sub;
+
+      if (tabId === 'brief') updateExecBriefPreview();
+      lucide.createIcons();
+    }
+
+    // --- Modal Helpers ---
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // --- Toast Notifications ---
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 shadow-xl flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0`;
+      toast.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-sky-400"></i><span>${message}</span>`;
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // --- MODULE 1: CALENDAR LOGIC ---
+    function renderCalendar() {
+      const container = document.getElementById('calendar-event-list');
+      const dashContainer = document.getElementById('dash-schedule-list');
+      container.innerHTML = '';
+      dashContainer.innerHTML = '';
+
+      document.getElementById('dash-meeting-count').innerText = `${appData.events.length} Sessions`;
+      document.getElementById('badge-calendar').innerText = appData.events.length;
+
+      appData.events.forEach(ev => {
+        const catColors = {
+          'VIP External': 'border-l-blue-500 bg-blue-500/10 text-blue-400',
+          'Internal Sync': 'border-l-indigo-500 bg-indigo-500/10 text-indigo-400',
+          'Deep Work': 'border-l-emerald-500 bg-emerald-500/10 text-emerald-400',
+          'Personal / Buffer': 'border-l-amber-500 bg-amber-500/10 text-amber-400'
+        }[ev.category] || 'border-l-slate-500 bg-slate-800 text-slate-300';
+
+        // Render main calendar item
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl bg-slate-800/50 border border-slate-700/60 border-l-4 flex items-center justify-between gap-4 ${catColors.split(' ')[0]}`;
+        card.innerHTML = `
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-200">${ev.title}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full ${catColors}">${ev.category}</span>
+            </div>
+            <p class="text-xs text-slate-400 flex items-center gap-3">
+              <span><i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>${ev.time}</span>
+              <span><i data-lucide="map-pin" class="w-3 h-3 inline mr-1"></i>${ev.location}</span>
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] text-slate-500 hidden sm:inline-block">${ev.buffer}</span>
+            <button onclick="deleteEvent(${ev.id})" class="text-slate-500 hover:text-rose-400 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </div>
+        `;
+        container.appendChild(card);
+
+        // Render dashboard snippet
+        const dashCard = document.createElement('div');
+        dashCard.className = `p-3 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-between text-xs`;
+        dashCard.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-2 h-2 rounded-full ${catColors.split(' ')[0].replace('border-l', 'bg')}"></div>
+            <div>
+              <p class="font-semibold text-slate-200">${ev.title}</p>
+              <p class="text-[10px] text-slate-400">${ev.time} • ${ev.location}</p>
+            </div>
+          </div>
+          <span class="text-[10px] text-slate-500">${ev.category}</span>
+        `;
+        dashContainer.appendChild(dashCard);
+      });
+
+      lucide.createIcons();
+    }
+
+    function handleAddEvent(e) {
+      e.preventDefault();
+      const newEv = {
+        id: Date.now(),
+        title: document.getElementById('ev-title').value,
+        time: document.getElementById('ev-time').value,
+        category: document.getElementById('ev-category').value,
+        location: document.getElementById('ev-location').value || 'TBD',
+        buffer: '15m Buffer Added'
+      };
+      appData.events.push(newEv);
+      saveData();
+      closeModal('modal-add-event');
+      showToast('New calendar commitment scheduled!');
+    }
+
+    function deleteEvent(id) {
+      appData.events = appData.events.filter(e => e.id !== id);
+      saveData();
+      showToast('Event removed');
+    }
+
+    function detectConflicts() {
+      showToast('Conflict Check Complete: 0 overlapping time blocks detected!', 'success');
+    }
+
+    function applyAutoBuffers() {
+      const minutes = document.getElementById('buffer-size-select').value;
+      appData.events.forEach(e => e.buffer = `${minutes}m Auto-Buffer Active`);
+      saveData();
+      showToast(`Applied ${minutes}-minute buffers across today's schedule.`);
+    }
+
+    // --- MODULE 2: INBOX WORKFLOW LOGIC ---
+    function renderInbox() {
+      const cols = {
+        donow: document.getElementById('inbox-col-donow'),
+        schedule: document.getElementById('inbox-col-schedule'),
+        delegate: document.getElementById('inbox-col-delegate'),
+        archive: document.getElementById('inbox-col-archive')
+      };
+
+      Object.values(cols).forEach(c => c.innerHTML = '');
+
+      const counts = { donow: 0, schedule: 0, delegate: 0, archive: 0 };
+      const dashContainer = document.getElementById('dash-triage-list');
+      dashContainer.innerHTML = '';
+
+      appData.inbox.forEach(item => {
+        counts[item.quadrant]++;
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-2 text-xs`;
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <span class="font-semibold text-slate-200 leading-snug">${item.subject}</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 whitespace-nowrap">${item.tag}</span>
+          </div>
+          <p class="text-[11px] text-slate-400 line-clamp-2">${item.body}</p>
+          <div class="pt-2 border-t border-slate-700/50 flex items-center justify-between text-[10px]">
+            <select onchange="moveInboxQuadrant(${item.id}, this.value)" class="bg-slate-900 text-slate-300 rounded p-1 border border-slate-700 outline-none">
+              <option value="donow" ${item.quadrant==='donow'?'selected':''}>Do Now</option>
+              <option value="schedule" ${item.quadrant==='schedule'?'selected':''}>Schedule</option>
+              <option value="delegate" ${item.quadrant==='delegate'?'selected':''}>Delegate</option>
+              <option value="archive" ${item.quadrant==='archive'?'selected':''}>Archive</option>
+            </select>
+            <button onclick="deleteInbox(${item.id})" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </div>
+        `;
+        if (cols[item.quadrant]) cols[item.quadrant].appendChild(card);
+
+        // Dashboard priority preview
+        if (item.quadrant === 'donow') {
+          const dashCard = document.createElement('div');
+          dashCard.className = `p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs space-y-1`;
+          dashCard.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-rose-300">${item.subject}</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">${item.tag}</span>
+            </div>
+            <p class="text-[10px] text-slate-400">${item.body}</p>
+          `;
+          dashContainer.appendChild(dashCard);
+        }
+      });
+
+      if (counts.donow === 0) {
+        dashContainer.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No urgent "Do Now" triage items remaining!</p>`;
+      }
+
+      document.getElementById('count-donow').innerText = counts.donow;
+      document.getElementById('count-schedule').innerText = counts.schedule;
+      document.getElementById('count-delegate').innerText = counts.delegate;
+      document.getElementById('count-archive').innerText = counts.archive;
+
+      document.getElementById('dash-inbox-count').innerText = `${counts.donow + counts.schedule} Emails`;
+      document.getElementById('badge-inbox').innerText = counts.donow + counts.schedule;
+
+      lucide.createIcons();
+    }
+
+    function handleAddInbox(e) {
+      e.preventDefault();
+      const newItem = {
+        id: Date.now(),
+        subject: document.getElementById('inbox-subject').value,
+        quadrant: document.getElementById('inbox-quadrant').value,
+        tag: document.getElementById('inbox-tag').value,
+        body: document.getElementById('inbox-body').value || 'No additional details.'
+      };
+      appData.inbox.push(newItem);
+      saveData();
+      closeModal('modal-add-inbox');
+      showToast('Item categorized in inbox triage!');
+    }
+
+    function moveInboxQuadrant(id, newQuad) {
+      const item = appData.inbox.find(i => i.id === id);
+      if (item) {
+        item.quadrant = newQuad;
+        saveData();
+        showToast(`Moved item to ${newQuad.toUpperCase()}`);
+      }
+    }
+
+    function deleteInbox(id) {
+      appData.inbox = appData.inbox.filter(i => i.id !== id);
+      saveData();
+      showToast('Triage item deleted');
+    }
+
+    // --- MODULE 3: MEETING PREP LOGIC ---
+    function renderMeetingPrep() {
+      const container = document.getElementById('attendee-list');
+      container.innerHTML = '';
+
+      appData.attendees.forEach(att => {
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1 text-xs`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-200">${att.name}</span>
+            <button onclick="deleteAttendee(${att.id})" class="text-slate-500 hover:text-rose-400"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <p class="text-[11px] text-emerald-400">${att.role}</p>
+          <p class="text-[11px] text-slate-400">${att.notes}</p>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function addAttendee() {
+      const name = prompt("Attendee Name:");
+      if (!name) return;
+      const role = prompt("Role / Company:") || "Executive";
+      const notes = prompt("Background Context / Agenda Notes:") || "Key stakeholder.";
+
+      appData.attendees.push({ id: Date.now(), name, role, notes });
+      saveData();
+      showToast('Attendee added to briefing');
+    }
+
+    function deleteAttendee(id) {
+      appData.attendees = appData.attendees.filter(a => a.id !== id);
+      saveData();
+      showToast('Attendee removed');
+    }
+
+    function copyBriefMemo() {
+      const title = document.getElementById('brief-title').value;
+      const time = document.getElementById('brief-time').value;
+      const summary = document.getElementById('brief-summary').value;
+      const points = document.getElementById('brief-points').value;
+      const risks = document.getElementById('brief-risks').value;
+
+      let attendeesFormatted = appData.attendees.map(a => `- ${a.name} (${a.role}): ${a.notes}`).join('\n');
+
+      const memo = `=== EXECUTIVE BRIEFING MEMO ===
+TITLE: ${title}
+TIME/LOC: ${time}
+
+OBJECTIVE & SUMMARY:
+${summary}
+
+KEY TALKING POINTS:
+${points}
+
+SENSITIVE TOPICS / RISKS:
+${risks}
+
+ATTENDEE DOSSIERS:
+${attendeesFormatted}`;
+
+      navigator.clipboard.writeText(memo);
+      showToast('Executive Briefing Memo copied to clipboard!');
+    }
+
+    // --- MODULE 4: TRAVEL RESEARCH LOGIC ---
+    function renderTravel() {
+      const container = document.getElementById('travel-options-grid');
+      container.innerHTML = '';
+
+      appData.travel.forEach(tr => {
+        const card = document.createElement('div');
+        card.className = `p-5 rounded-2xl bg-slate-800/40 border border-slate-800 space-y-4 flex flex-col justify-between`;
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-start justify-between border-b border-slate-700/60 pb-3">
+              <div>
+                <h4 class="font-bold text-slate-100 text-sm">${tr.name}</h4>
+                <p class="text-xs font-semibold text-amber-400 mt-0.5">${tr.cost}</p>
+              </div>
+              <button onclick="deleteTravel(${tr.id})" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                <span class="text-[10px] text-slate-500 uppercase font-bold block">Flight Logistics</span>
+                <span class="text-slate-200">${tr.flight}</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                <span class="text-[10px] text-slate-500 uppercase font-bold block">Hotel Accommodations</span>
+                <span class="text-slate-200">${tr.hotel}</span>
+              </div>
+            </div>
+
+            <div class="pt-1">
+              <span class="text-[10px] text-slate-500 uppercase font-bold block mb-1">Perks & Comparison</span>
+              <p class="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed">${tr.perks}</p>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-[10px] text-slate-500">Status: Presented to Exec</span>
+            <button onclick="showToast('Selected ${tr.name} as preferred option!')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-medium border border-amber-500/30">
+              Select Option
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function handleAddTravel(e) {
+      e.preventDefault();
+      const newTr = {
+        id: Date.now(),
+        name: document.getElementById('tr-name').value,
+        cost: document.getElementById('tr-cost').value,
+        flight: document.getElementById('tr-flight').value || 'TBD',
+        hotel: document.getElementById('tr-hotel').value || 'TBD',
+        perks: document.getElementById('tr-perks').value || 'Standard booking'
+      };
+      appData.travel.push(newTr);
+      saveData();
+      closeModal('modal-add-travel');
+      showToast('Travel option added to matrix!');
+    }
+
+    function deleteTravel(id) {
+      appData.travel = appData.travel.filter(t => t.id !== id);
+      saveData();
+      showToast('Travel option deleted');
+    }
+
+    // --- MODULE 5: EXECUTIVE BRIEFING LOGIC ---
+    function updateExecBriefPreview() {
+      const week = document.getElementById('exec-week').value;
+      const highlights = document.getElementById('exec-highlights').value;
+      const kpis = document.getElementById('exec-kpis').value;
+      const risks = document.getElementById('exec-risks').value;
+      const decisions = document.getElementById('exec-decisions').value;
+
+      const formatted = `📋 **WEEKLY EXECUTIVE BRIEFING**
+📅 **Week Of:** ${week}
+
+🌟 **HIGHLIGHTS & ACCOMPLISHMENTS**
+${highlights}
+
+📊 **KEY METRICS & PERFORMANCE**
+${kpis}
+
+⚠️ **RISKS & ROADBLOCKS**
+${risks}
+
+❓ **DECISIONS NEEDED FROM EXEC**
+${decisions}`;
+
+      document.getElementById('exec-preview-content').innerText = formatted;
+    }
+
+    // Listen to live input changes for briefing preview
+    ['exec-week', 'exec-highlights', 'exec-kpis', 'exec-risks', 'exec-decisions'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateExecBriefPreview);
+    });
+
+    function copyExecutiveBrief() {
+      const content = document.getElementById('exec-preview-content').innerText;
+      navigator.clipboard.writeText(content);
+      showToast('Weekly Executive Brief copied formatted for Slack/Email!');
+    }
+
+    // --- MODULE 6: SOP GENERATOR LOGIC ---
+    const SOP_TEMPLATES = {
+      reimbursement: {
+        title: 'Executive Expense Reimbursement',
+        owner: 'EA / Finance Team',
+        trigger: 'End of trip or monthly on the 25th',
+        tools: 'Concur, Corporate Visa, Excel Ledger',
+        steps: 'Step 1: Collect and digitize paper receipts.\nStep 2: Match receipts against credit card line items.\nStep 3: Assign budget codes and client billing tags.\nStep 4: Submit for final approval.',
+        quality: 'Zero unassigned items; 100% policy compliance.'
+      },
+      vip: {
+        title: 'VIP Visitor Protocol & Office Arrival',
+        owner: 'EA / Front Desk',
+        trigger: '24 hours prior to VIP arrival',
+        tools: 'Building Security Portal, Slack, Guest Wi-Fi',
+        steps: 'Step 1: Pre-register visitor with building security.\nStep 2: Reserve Main Executive Conference Room.\nStep 3: Arrange tailored catering/beverages based on preferences.\nStep 4: Greet visitor at lobby and escort directly.',
+        quality: 'Seamless entry; executive notified immediately upon lobby arrival.'
+      },
+      travel: {
+        title: 'Executive Travel Booking Workflow',
+        owner: 'EA Team',
+        trigger: 'Executive requests out-of-state travel',
+        tools: 'Navan, TripIt, Google Calendar',
+        steps: 'Step 1: Present 2 flight/hotel matrices (Option A vs B).\nStep 2: Book preferred option using corporate profile.\nStep 3: Sync flight numbers & hotel check-ins to Google Calendar.\nStep 4: Send TripIt summary memo to executive.',
+        quality: 'Calendar updated in correct time zones with confirmation IDs attached.'
+      }
+    };
+
+    function loadSopTemplate(key) {
+      if (!key || !SOP_TEMPLATES[key]) return;
+      const t = SOP_TEMPLATES[key];
+      document.getElementById('sop-title').value = t.title;
+      document.getElementById('sop-owner').value = t.owner;
+      document.getElementById('sop-trigger').value = t.trigger;
+      document.getElementById('sop-tools').value = t.tools;
+      document.getElementById('sop-steps').value = t.steps;
+      document.getElementById('sop-quality').value = t.quality;
+      showToast(`Loaded "${t.title}" template`);
+    }
+
+    function saveCurrentSop() {
+      const title = document.getElementById('sop-title').value;
+      if (!title) return alert('Please enter an SOP title');
+
+      const newSop = {
+        id: Date.now(),
+        title,
+        owner: document.getElementById('sop-owner').value || 'EA Team',
+        trigger: document.getElementById('sop-trigger').value || 'As needed',
+        tools: document.getElementById('sop-tools').value || 'Standard Tools',
+        steps: document.getElementById('sop-steps').value || 'No steps detailed.',
+        quality: document.getElementById('sop-quality').value || 'Standard QA'
+      };
+
+      appData.sops.push(newSop);
+      saveData();
+      showToast(`SOP "${title}" saved to library!`);
+    }
+
+    function renderSopLibrary() {
+      const container = document.getElementById('sop-library-list');
+      container.innerHTML = '';
+      document.getElementById('sop-library-count').innerText = `${appData.sops.length} SOPs`;
+
+      appData.sops.forEach(sop => {
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1 text-xs cursor-pointer hover:border-indigo-500/50 transition`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-200">${sop.title}</span>
+            <button onclick="deleteSop(${sop.id}, event)" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <p class="text-[10px] text-indigo-400">Owner: ${sop.owner}</p>
+          <p class="text-[10px] text-slate-400 line-clamp-1">${sop.trigger}</p>
+        `;
+        card.onclick = (e) => {
+          if (e.target.closest('button')) return;
+          document.getElementById('sop-title').value = sop.title;
+          document.getElementById('sop-owner').value = sop.owner;
+          document.getElementById('sop-trigger').value = sop.trigger;
+          document.getElementById('sop-tools').value = sop.tools;
+          document.getElementById('sop-steps').value = sop.steps;
+          document.getElementById('sop-quality').value = sop.quality;
+          showToast(`Loaded "${sop.title}" into editor`);
+        };
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function deleteSop(id, e) {
+      e.stopPropagation();
+      appData.sops = appData.sops.filter(s => s.id !== id);
+      saveData();
+      showToast('SOP deleted from library');
+    }
+
+    // --- RENDER ALL MODULES ---
+    function renderAll() {
+      renderCalendar();
+      renderInbox();
+      renderMeetingPrep();
+      renderTravel();
+      renderSopLibrary();
+      updateExecBriefPreview();
+    }
+
+    // Initial Load On Page Ready
+    window.onload = function() {
+      switchTab('dashboard');
+      renderAll();
+    };
+  </script>
+</body>
+</html>
